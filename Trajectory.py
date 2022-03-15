@@ -30,6 +30,25 @@ def f_glob(x_glob,t): # x_glob = (x1,x2,x3,x4,x5,z1,z2,z3,z4,z5,z6).T, the globa
     return np.array([x_glob[1], -np.sin(x_glob[0]) - mu * x_glob[1] + x_glob[2], x_glob[3],
          -x_glob[4]*x_glob[2], 0, psi[0], psi[1], psi[2], psi[3], psi[4], psi[5]])
 
+#functions that process:
+def preprocess_x(x,min_x,max_x):
+    x_prepr = np.zeros(x.shape)
+    for i in range (x.shape[0]):
+        x_prepr[i] = (x[i] - min_x[i])/(max_x[i] - min_x[i])
+    return x_prepr
+
+def preprocess_data_x(x_data,min_x,max_x):
+    x_data_prep = np.zeros(x_data.shape)
+    for i in range (x_data.shape[0]):
+        x_data_prep[i,:] = preprocess_x(x_data[i,:],min_x,max_x)
+    return x_data_prep
+
+def deprocess_x(x,min_x,max_x):
+    x_depro = np.zeros(x.shape)
+    for i in range (x.shape[0]):
+        x_depro[i] = (max_x[i] - min_x[i])*x[i] + min_x[i]
+    return x_depro
+
 def f_glob_2(x_glob,t,w): # x_glob = (x1,x2,x3,x4,x5,z1,z2,z3,z4,z5,z6).T, the global system with x and z
     y = np.array([x_glob[0],Amp*np.cos(w*t-fi)])
     z = x_glob[2:]
