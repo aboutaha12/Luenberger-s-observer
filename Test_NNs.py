@@ -1,0 +1,161 @@
+
+
+#Test of the models
+
+model_predict_z =  tf.keras.models.load_model("mymodel_-2,2")
+model_predict_x = tf.keras.models.load_model("mymodel_inv_-2,2")
+
+**Test of the model_predict_x on the test set**
+
+
+results_prep = model_predict_x.evaluate(z_test_preprocessed,x_test_preprocessed[:,:2],batch_size=128)
+print(results_prep)
+
+i = np.random.randint(0,640000,4)
+for k in i:
+  print(f'modele prep k : {k}, x_test : {deprocess_x(x_test_preprocessed[k,:2],min_x,max_x)}, x_predicted :{deprocess_x(model_predict_x.predict(z_test_preprocessed[k,:].reshape(1,6))[0],min_x,max_x)}')
+  print('\n')
+
+**Test of model_predict_x on random points**
+
+
+def test_x(tc):
+    x1 = (2*np.pi) * np.random.random_sample((5,)) - np.pi
+    x2 = 2 * np.random.random_sample((5,)) -1
+    x3 = 2 * np.random.random_sample((5,)) -1
+    x4 = 2 * np.random.random_sample((5,)) -1
+    x5 = (1-0.1) * np.random.random_sample((5,)) + 0.1
+    s = 0
+    x_errors = np.zeros((5**5,2))
+    for i_x1 in x1:
+        for i_x2 in x2:
+            for i_x3 in x3:
+                for i_x4 in x4:
+                    for i_x5 in x5:
+                        x_init = np.array([i_x1, i_x2, i_x3, i_x4, i_x5])
+
+                        # Simulate (1) in backward during tc:
+                        sol = odeint(f_back, x_init, tc)
+                        x_init_back = sol[-1,:] # on prend le dernier point 
+
+                        # Simulate (1) et (2) forward during tc:
+                        x_glob_init = np.array([x_init_back[0], x_init_back[1],x_init_back[2],x_init_back[3],x_init_back[4],
+                                0,0,0,0,0,0])
+                        solu = odeint(f_glob, x_glob_init, tc)
+                        z_reel = solu[-1,5:]
+                        z_reel_preproc = preprocess_x(z_reel,min_z,max_z)
+
+                        # x predicted by the neural network:
+                        x_predit = deprocess_x(model_predict_x.predict(z_reel_preproc.reshape(1,6))[0],min_x,max_x) 
+
+                        # compute the error in the array:
+                        x_errors[s,:] = x_init[:2] - x_predit 
+                        s += 1
+                                   
+    return x_errors
+
+tc = 10
+t_c = np.linspace(0, tc, 1000)
+x_errors = test_x(t_c)
+
+def hist(z_errors,ligne,colonne):
+    fig = plt.figure(figsize=(10,6))
+    for i in range(z_errors.shape[1]):
+        ax = plt.subplot(ligne,colonne,i+1)
+
+        z_i = np.abs(z_errors[:,i])
+        for k in range(len(z_i)):
+            if z_i[k] == 0:
+                z_i[k] = 10**(-8)
+        z_i = np.log10(z_i) # logarithmic scale
+
+        bins = np.arange(0,1,0.1)
+        ax.hist(z_i)
+        ax.set_title(f"Errors for the {i}-th composent")
+    plt.xlabel(f'mean squared errors')
+    plt.ylabel('number of points')
+    plt.show()
+    
+
+def hist_i(z_errors,ligne,colonne,i,bol=False):
+    fig = plt.figure(figsize=(10,6))
+    z_i = np.abs(z_errors[:,i])
+    for k in range(len(z_i)):
+        if z_i[k] == 0:
+            z_i[k] = 10**(-8)
+    z_i = np.log10(z_i) # logarithmic scale
+
+    bins = np.arange(0,1,0.1)
+    plt.hist(z_i)
+    if not bol:
+      #plt.title(f"Errors for ($z_{{{i}}}$,$\hat{{z}}_{{{i}}}$)")
+      plt.xlabel(f'mean squared errors')
+      plt.ylabel('number of points')
+      #plt.savefig(f'histogramme_z_{i}')
+    else:
+      #plt.title(f"Errors for ($x_{{{i}}}$,$\hat{{x}}_{{{i}}}$)")
+      plt.xlabel(f'mean squared errors')
+      plt.ylabel('number of points')
+      #plt.savefig(f'histogramme_x_{i}') 
+    plt.show()
+
+hist(x_errors,1,2)
+
+for i in range(x_errors.shape[1]): 
+    hist_i(x_errors,1,2,i,True)
+
+**Test of model_predict_z on the test set**
+
+results_prep = model_predict_z.evaluate(x_test_preprocessed,z_test_preprocessed,batch_size=128)
+print(results_prep)
+
+i = np.random.randint(0,640000,4)
+for k in i:
+  print(f'modele prep k : {k}, z_test : {deprocess_x(z_test_preprocessed[k,:],min_z,max_z)}, z_predict:{deprocess_x(model_predict_z.predict(x_test_preprocessed[k,:].reshape(1,5))[0],min_z,max_z)}')
+  print('\n')
+
+**Test of model_predict_z on random points**
+
+def test_z(tc):
+    x1 = (2*np.pi) * np.random.random_sample((5,)) - np.pi
+    x2 = 2 * np.random.random_sample((5,)) -1
+    x3 = 2 * np.random.random_sample((5,)) -1
+    x4 = 2 * np.random.random_sample((5,)) -1
+    x5 = (1-0.1) * np.random.random_sample((5,)) + 0.1
+    s = 0
+    z_errors = np.zeros((5**5,6))
+    for i_x1 in x1:
+        for i_x2 in x2:
+            for i_x3 in x3:
+                for i_x4 in x4:
+                    for i_x5 in x5:
+                        x_init = np.array([i_x1, i_x2, i_x3, i_x4, i_x5])
+
+                        # Simulate (1) backward during tc:
+                        sol = odeint(f_back, x_init, tc)
+                        x_init_back = sol[-1,:] # on prend le dernier point 
+
+                        # Simulate (1) et (2) forward during the same tc:
+                        x_glob_init = np.array([x_init_back[0], x_init_back[1],x_init_back[2],x_init_back[3],x_init_back[4],
+                                0,0,0,0,0,0])
+                        solu = odeint(f_glob, x_glob_init, tc)
+                        z_real = solu[-1,5:]
+                        x_preproc = preprocess_x(x_init,min_x,max_x)
+
+                        # z_predicted using the neural network:
+                        z_predit = deprocess_x(model_predict_z.predict(x_preproc.reshape(1,5))[0],min_z,max_z) 
+
+                        # compute the error:
+                        z_errors[s,:] = z_real - z_predit 
+                        s += 1
+                                   
+    return z_errors
+
+tc = 10
+t_c = np.linspace(0, tc, 1000)
+z_errors = test_z(t_c)
+
+hist(z_errors,3,2)
+
+for i in range(z_errors.shape[1]): 
+    hist_i(z_errors,3,2,i,False)
