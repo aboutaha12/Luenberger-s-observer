@@ -34,8 +34,10 @@ def f_glob(x_glob,t): # x_glob = (x1,x2,x3,x4,x5,z1,z2,z3,z4,z5,z6).T, the globa
          -x_glob[4]*x_glob[2], 0, psi[0], psi[1], psi[2], psi[3], psi[4], psi[5]])
 
 #Test of the models
-min_x = 
-max_x
+min_x=np.load("min_x_train")
+max_x=np.load("max_x_train")
+min_z=np.load("min_z_train")
+max_z=np.load("max_z_train")
 
 model_predict_z =  tf.keras.models.load_model("mymodel_-2,2")
 model_predict_x = tf.keras.models.load_model("mymodel_inv_-2,2")
