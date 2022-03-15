@@ -1,3 +1,10 @@
+import numpy as np
+import matplotlib.pyplot as plt
+from keras.models import Sequential
+from keras.layers import Dense
+import tensorflow as tf
+from keras.callbacks import EarlyStopping
+
 x_train_preprocessed = np.load("x_train_preproc.npy")
 x_test_preprocessed = np.load("x_test_preproc.npy")
 z_train_preprocessed = np.load("z_train_preproc.npy")
