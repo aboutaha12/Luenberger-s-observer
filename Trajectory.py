@@ -49,6 +49,10 @@ max_x=np.load("max_x_train.npy")
 min_z=np.load("min_z_train.npy")
 max_z=np.load("max_z_train.npy")
 
+# models:
+model_predict_z =  tf.keras.models.load_model("mymodel_-2,2")
+model_predict_x = tf.keras.models.load_model("mymodel_inv_-2,2")
+
 # we choose an x to stay in the domain that we fixed and on which we trained the NN
 x_simu = np.array([ 0.33019075, -0.71512765]) # w1= 0.52135956 , w2=0.06146751, w3=0.10147915]
     
