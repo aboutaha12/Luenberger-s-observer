@@ -85,4 +85,4 @@ The loss function (mean squared error) on the test set for $NN_1$ is $4,2.10^{-7
 Then, we can for each point have access to the mean squared error (for the couples ($x,x_{predicted}$) and ($z=T(x),z_{predicted}$)) and plot an histogram for each component with the logarithmic error in the $x$-axis and the number of points in the $y$-axis.
 
 ### What you should execute:
-
+You should execute the scirpt "4-Test_Neural_Networks.py". The lines 46-47
