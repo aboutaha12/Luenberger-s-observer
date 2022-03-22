@@ -52,6 +52,7 @@ We then splitted the data set into a training set and a test set (with a test si
 
 ### Run:
 In order to create the final datasets preprocessed run the script   .The last lines will save the train and test sets.
+The lines 114-117 save the arrays min_x,max_x,min_z and max_z that represents the minimum and maximum of each component for the train set and are necessary for the preprocessing each time.
 
 ## Third step:
 Train of the neural network.
