@@ -101,7 +101,12 @@ Amp = 0.5557902677321038
 fi = 0.3538347020102439 $$
 We obtain the figures for z,T(x_real),T(x_predicted) and for x_real and x_predicted in the folder 
 
-* The we apply the method to an input with a lightly variable frequency (which equals w/2 for t<16, w for t>24 and a polynomial interpolation of order 3 between the two) with the same formula Amp*np.cos(w*t-fi).
+* The, we apply the method to the same input Amp*np.cos(w*t-fi) but this time with a lightly variable frequency (which equals w/2 for t<16, w for t>24 and a polynomial interpolation of order 3 between the two).
 We obtain the figures for z,T(x_real),T(x_predicted) and for x_real and x_predicted in the folder 
 
-* Lastly we apply the method to an input with 
+
+* Last we apply the method to the same input Amp*np.cos(w*t-fi) but this time with a sudden jump in frequency (which equals w/2 for t<16, w for t>18 and a polynomial interpolation of order 3 between the two).
+We obtain the figures for z,T(x_real),T(x_predicted) and for x_real and x_predicted in the folder 
+
+### What you need the execute:
+In order to obtain all these figures, you only need to execute the script "Trajectory" using the arrays min_x,max_x,min_z,max_z and the models in the repository (but you can modify it respectively in the lines) 
