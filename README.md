@@ -109,4 +109,4 @@ We obtain the figures for z,T(x_real),T(x_predicted) and for x_real and x_predic
 We obtain the figures for z,T(x_real),T(x_predicted) and for x_real and x_predicted in the folder 
 
 ### What you need the execute:
-In order to obtain all these figures, you only need to execute the script "Trajectory" using the arrays min_x,max_x,min_z,max_z and the models in the repository (but you can modify it respectively in the lines) 
+In order to obtain all these figures, you only need to execute the script "Trajectory" using the arrays min_x,max_x,min_z,max_z and the models in the repository (but you can modify it respectively in the lines 47-50 and 53-54) 
