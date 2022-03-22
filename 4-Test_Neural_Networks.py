@@ -117,7 +117,7 @@ def hist(z_errors,ligne,colonne):
     plt.ylabel('number of points')
     plt.show()
     
-hist(x_errors,1,2)
+#hist(x_errors,1,2) # uncomment to show the histogramms of the errors on x
 
 #Test of model_predict_z on the test set
 results_prep = model_predict_z.evaluate(x_test_preprocessed,z_test_preprocessed,batch_size=128)
@@ -172,4 +172,5 @@ t_c = np.linspace(0, tc, 1000)
 z_errors = test_z(t_c)
 
 # Histogram of the errors
-hist(z_errors,3,2)
+# hist(z_errors,3,2) # uncomment to show the histogramms of the errors on z
+
