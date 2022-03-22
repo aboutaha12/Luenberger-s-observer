@@ -70,4 +70,4 @@ The choice of the number of training epochs to use is also important for trainin
 We can then train both $NN_1$ and $NN_2$ using the train set.
 
 ### Run:
-
+In order to train both neural networks execute the script "3-Train_Neural_Networks.py".You need to have gone through the second step to be able to obtain the correct datasets. However, if you have other datasets you can only replace the lines by loading the datasets you want.
