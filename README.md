@@ -50,9 +50,9 @@ Applying this procedure to each of the $20^5$ points we obtain a data set of cou
 
 We then splitted the data set into a training set and a test set (with a test size of $20\%$).Then, we prepossessed the data from the training set with a MinMaxScaler Transformation using the minimum and the maximum for each dimension in the data set to make all the components of the data set in $[0,1]$.
 
-### Run:
-In order to create the final datasets preprocessed run the script   .The last lines will save the train and test sets.
-The lines 114-117 save the arrays min_x,max_x,min_z and max_z that represents the minimum and maximum of each component for the train set and are necessary for the preprocessing each time.
+###  What you should execute:
+In order to create the final datasets preprocessed run the script "2-Datasets_generation.py" .The last lines will save the train and test sets.
+The lines 114-117 save the arrays min_x,max_x,min_z and max_z that represents the minimum and maximum of each component for the train set and are necessary for the preprocessing each time. For the dataset used here, you can already find these arrays in the repository.
 
 ## Third step:
 Train of the neural network.
@@ -69,5 +69,20 @@ The choice of the number of training epochs to use is also important for trainin
 
 We can then train both $NN_1$ and $NN_2$ using the train set.
 
-### Run:
-In order to train both neural networks execute the script "3-Train_Neural_Networks.py".You need to have gone through the second step to be able to obtain the correct datasets. However, if you have other datasets you can only replace the lines by loading the datasets you want.
+### What you should execute:
+In order to train both neural networks execute the script "3-Train_Neural_Networks.py".You need to have gone through the second step to be able to obtain the correct datasets. However, if you have other datasets you can only replace the lines 8-11 by loading the datasets you want.
+
+## Forth step:
+Test the neural networks with the test set and with random points.
+
+### What we do in this part:
+\textit{Evaluation on the test set:}
+Applying the neural network on the test set allows us to have an estimate of the performance of each neural network. In order to apply the model to each point of the test set we should firstly preprocess the data as we did for the training : we use the MinMaxScaler Transformation for each dimension with the minimum and maximum obtained on \textbf{the train set}.Then we apply $NN_1$ for each point $x_{\textrm{test-preprocessed}}$ and we compares the estimated $\hat{x}_{\textrm{test-preprocessed}}$ to $z_{\textrm{test-preprocessed}}$ (using the mean squared error).We do the same procedure for $NN_2$ (applying it to each $z_{\textrm{test-preprocessed}}$ and comparing the estimated $\hat{z}_{\textrm{test-preprocessed}}$ to the first two components of $x_{\textrm{test-preprocessed}}$ using the loss function).
+
+The loss function (mean squared error) on the test set for $NN_1$ is $4,2.10^{-7}$ and for $NN_2$ is $10^{-6}$.
+
+\textit{Evaluation on other random points:} In order to evaluate the performances of the models on new point that are not in the data set, we randomly choose 3000 points in $\mathcal{X}\times\mathcal{W}$.We apply the same method that we use on the synthesis of the data set to form for each point $x$ the couple $(x,T(x))$. After applying the MinMaxScaler Transformation for this couple, we predict $z_{predicted}$ using the $NN_1$ (with $x$ as the input of the neural network) and an $x_{predicted}$ using the $NN_2$ (with $z$ as the input).
+Then, we can for each point have access to the mean squared error (for the couples ($x,x_{predicted}$) and ($z=T(x),z_{predicted}$)) and plot an histogram for each component with the logarithmic error in the $x$-axis and the number of points in the $y$-axis.
+
+### What you should execute:
+
