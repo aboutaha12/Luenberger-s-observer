@@ -4,7 +4,7 @@ Our goal is to synthesize a numerical nonlinear Luenberger observer (KKL observe
 
 We then test the robustness of this observer by applying to the system inputs that are not exactly in the considered class, namely sinusoidal excitations with a slightly variable frequency and then a larger frequency discontinuity.
 
-This work was carried out by Taha Balki at the Centre Automatique et Systèmes, Mines Paris, Université PSL, during a research trimester supervised by Pauline Bernard and Florent Di Meglio. 
+This work was carried out by Taha Balkhi at the Centre Automatique et Systèmes, Mines Paris, Université PSL, during a research trimester supervised by Pauline Bernard and Florent Di Meglio. 
 
 More details on the theory and design of functional KKL observers appear in 
 
