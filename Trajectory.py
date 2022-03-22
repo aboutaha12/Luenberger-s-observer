@@ -34,7 +34,7 @@ def deprocess_x(x,min_x,max_x):
         x_depro[i] = (max_x[i] - min_x[i])*x[i] + min_x[i]
     return x_depro
 
-# function used:
+# function used for a fixed frequency sinus:
 def f_glob(x_glob,t,w): # x_glob = (x1,x2,x3,x4,x5,z1,z2,z3,z4,z5,z6).T, the global system with x and z
     u = Amp*np.cos(w*t-fi)
     y = np.array([x_glob[0],u])
@@ -49,7 +49,7 @@ max_x=np.load("max_x_train.npy")
 min_z=np.load("min_z_train.npy")
 max_z=np.load("max_z_train.npy")
 
-# models:
+# import the models:
 model_predict_z =  tf.keras.models.load_model("mymodel_-2,2")
 model_predict_x = tf.keras.models.load_model("mymodel_inv_-2,2")
 
@@ -69,6 +69,7 @@ def inpu(t,w):
 def dot_inpu(t,w):
   return -Amp*w*np.sin(w*t-fi)
 
+# simulate a trajectory and use the model to predict it using the Luenberger's transformation
 def traj(t,w,x=np.array([0,0])):
     x_glob_init = np.zeros((8,))
     if (x == np.array([0,0])).all():
@@ -103,7 +104,7 @@ def traj(t,w,x=np.array([0,0])):
         z_i = z_modified[i,:]
         z_i = preprocess_x(z_i,min_z,max_z)
         x_predicted_i = model_predict_x.predict(z_i.reshape(1,6))[0]     
-        x_predicted[i] = deprocess_x(x_predicted_i,min_x,max_x)# + np.array([2*np.pi*k1_choosed,0])
+        x_predicted[i] = deprocess_x(x_predicted_i,min_x,max_x)
 
         #in order to compare z to T(x_real) and T(x_predicted:)
         p = np.array([x_predicted[i][0],x_predicted[i][1],u,dot_u,freq**2])
@@ -124,6 +125,8 @@ for k in range(6):
     z_k = z[:,k]
     T_x_k = T_x[:,k]
     T_x_hat_k = T_x_hat[:,k]
+    # x_k = x[:,k]
+    # x_predit_k = x_predit[:,k] 
 
     plt.plot(t,z_k,label=f'$z_{{{k+1}}}$')
     plt.plot(t,T_x_k,label=f'$T(x_{{real}})_{{{k+1}}}$')
@@ -131,21 +134,26 @@ for k in range(6):
     plt.plot(t,T_x_hat_k,label=f'$T(x_{{predicted}})_{{{k+1}}}$')
     plt.xlabel('time')
     plt.legend(loc='upper right')
+    # plt.savefig(f'Simu_z pour k={k} w={w}.png') #uncomment this line if you want to save the figure
     plt.show()
-
-for k in range (2):
+    
+ for k in range (2):
     x_k = x[:,k]
     x_predit_k = x_predit[:,k] 
     plt.plot(t,x_k,label=f'$x_{{real_{{{k+1}}}}}$',color='blue')
     plt.plot(t,x_predit_k,label=f'$x_{{predicted_{{{k+1}}}}}$',color='green')
     plt.xlabel('time')
     plt.legend(loc='upper right')
+    # plt.savefig(f'Simu_x pour k={k} w={w}.png') #uncomment this line if you want to save the figure
     plt.show()
+    
+# show th input:
+plt.plot(t,inpu(t,w),label='input')
+plt.savefig(f'Sinus with w={w}.png')
 
-# A new input : a sinudusoid with a variant frequency:
+# Using a sinus with a slowly variable frequency:
 def omega(t,w,k1,k2):
   freqs = np.zeros(t.shape)
-  print(t.shape[0])
   M = np.array([[k1**3,k1**2,k1,1],[k2**3,k2**2,k2,1],[3*k1**2,2*k1,1,0],[3*k2**2,2*k2,1,0]])
   N = np.array([w/2,w,0,0])
   x = np.linalg.solve(M,N)
@@ -171,7 +179,7 @@ def dot_omega(t,w,k1,k2):
     elif t[i] > k2:
       d_freqs[i] = 0
     else: #cad k1<= t[i] <= k2
-      d_freqs[i] = a*(t[i]**2)+b*(t[i])+c
+      d_freqs[i] = 3*a*(t[i]**2)+2*b*(t[i])+c
   return d_freqs
 
 # show how this new input looks like
@@ -182,11 +190,12 @@ plt.plot(t,Amp*np.cos(w*t-fi),label='w')
 plt.plot(t,input2,label='input 2')
 plt.legend()
 
-def inpu_2(t,w):
-  return Amp*np.cos(omega(t,w,14,26)*t-fi)
+# new functions introduced in this case:
+def inpu_2(t,w,k1,k2):
+  return Amp*np.cos(omega(t,w,k1,k2)*t-fi)
 
-def dot_inpu_2(t,w):
-  return -Amp*(dot_omega(t,w,14,26)*t+omega(t,w,14,26))*np.sin(omega(t,w,14,26)*t-fi)
+def dot_inpu_2(t,w,k1,k2):
+  return -Amp*(dot_omega(t,w,k1,k2)*t+omega(t,w,k1,k2))*np.sin(omega(t,w,k1,k2)*t-fi)
 
 def f_glob_2(x_glob,t,k1,k2,w): # x_glob = (x1,x2,x3,x4,x5,z1,z2,z3,z4,z5,z6).T, the global system with x and z
     M = np.array([[k1**3,k1**2,k1,1],[k2**3,k2**2,k2,1],[3*k1**2,2*k1,1,0],[3*k2**2,2*k2,1,0]])
@@ -194,17 +203,18 @@ def f_glob_2(x_glob,t,k1,k2,w): # x_glob = (x1,x2,x3,x4,x5,z1,z2,z3,z4,z5,z6).T,
     x = np.linalg.solve(M,N)
     a,b,c,d = x
     if t < k1:
-      u = w/2
+      freq = w/2
     elif t > k2:
-      u = w
+      freq = w
     else: #cad k1<= t[i] <= k2
-      u = a*(t[i]**3)+b*(t[i]**2)+c*t[i]+d
-    y = np.array([x_glob[0],Amp*np.cos(u*t-fi)])
+      freq = a*(t**3)+b*(t**2)+c*t+d
+    u = Amp*np.cos(freq*t-fi)
+    y = np.array([x_glob[0],u])
     z = x_glob[2:]
     psi = np.array(np.dot(A,z) + np.dot(B,y))
     return np.array([x_glob[1], -np.sin(x_glob[0]) - mu * x_glob[1] + u,
                      psi[0], psi[1], psi[2], psi[3], psi[4], psi[5]])
-  
+
 def traj_2(t,w,k1,k2,x=np.array([0,0])):
     x_glob_init = np.zeros((8,))
     if (x == np.array([0,0])).all():
@@ -220,9 +230,9 @@ def traj_2(t,w,k1,k2,x=np.array([0,0])):
     z = solu[:,2:]
     x = solu[:,:2]
 
-    input = inpu_2(t,w)
-    dot_input = dot_inpu_2(t,w)
-    freqs = omega(t,w,14,26)
+    input = inpu_2(t,w,k1,k2)
+    dot_input = dot_inpu_2(t,w,k1,k2)
+    freqs = omega(t,w,k1,k2)
 
     T_x = np.zeros(z.shape)
     T_x_hat = np.zeros(z.shape)
@@ -239,7 +249,7 @@ def traj_2(t,w,k1,k2,x=np.array([0,0])):
         z_i = z_modified[i,:]
         z_i = preprocess_x(z_i,min_z,max_z)
         x_predicted_i = model_predict_x.predict(z_i.reshape(1,6))[0]     
-        x_predicted[i] = deprocess_x(x_predicted_i,min_x,max_x)# + np.array([2*np.pi*k1_choosed,0])
+        x_predicted[i] = deprocess_x(x_predicted_i,min_x,max_x)
 
         #in order to compare z to T(x_real) and T(x_predicted:)
         p = np.array([x_predicted[i][0],x_predicted[i][1],u,dot_u,freq**2])
@@ -250,10 +260,10 @@ def traj_2(t,w,k1,k2,x=np.array([0,0])):
         x_prep = preprocess_x(x_i,min_x,max_x)
         T_x_i = model_predict_z.predict(x_prep.reshape(1,5))[0] 
         T_x[i] = deprocess_x(T_x_i,min_z,max_z)
-    return x,z,x_predicted,T_x,T_x_hat,input
+    return x,z,x_predicted,T_x,T_x_hat,input,dot_input,freqs
 
 t = np.linspace(0,40,200)
-x,z,x_predit,T_x,T_x_hat,input = traj_2(t,w,80,120,x_simu)
+x,z,x_predit,T_x,T_x_hat,input,dot_input,freqs = traj_2(t,w,16,24,x_simu)
 
 for k in range(6):
     z_k = z[:,k]
@@ -266,8 +276,9 @@ for k in range(6):
     plt.plot(t,T_x_hat_k,label=f'$T(x_{{predicted}})_{{{k+1}}}$')
     plt.xlabel('time')
     plt.legend(loc='upper right')
+    #plt.savefig(f'Simu_z pour k={k} w={w} k1={16} k2={24}.png') #uncomment this line if you want to save the figure
     plt.show()
-
+    
 for k in range (2):
     x_k = x[:,k]
     x_predit_k = x_predit[:,k] 
@@ -275,4 +286,44 @@ for k in range (2):
     plt.plot(t,x_predit_k,label=f'$x_{{predicted_{{{k+1}}}}}$',color='green')
     plt.xlabel('time')
     plt.legend(loc='upper right')
+    #plt.savefig(f'Simu_x pour k={k} w={w} k1={16} k2={24}.png') #uncomment this line if you want to save the figure
     plt.show()
+    #plt.plot(t,x_predit_k-x_k)  # uncomment these lines if you want to plot the difference between the real x and the predicted one
+    #plt.show()
+
+#in order to show the input
+plt.plot(t,input)
+#plt.savefig(f'input w={w} k1={16} k2={24}.png') #uncomment this line if you want to save the figure
+
+# with a sudden frequency jump
+t = np.linspace(0,40,200)
+x,z,x_predit,T_x,T_x_hat,input,dot_input,freqs = traj_2(t,w,16,18,x_simu)
+
+for k in range(6):
+    z_k = z[:,k]
+    T_x_k = T_x[:,k]
+    T_x_hat_k = T_x_hat[:,k]
+
+    plt.plot(t,z_k,label=f'$z_{{{k+1}}}$')
+    plt.plot(t,T_x_k,label=f'$T(x_{{real}})_{{{k+1}}}$')
+
+    plt.plot(t,T_x_hat_k,label=f'$T(x_{{predicted}})_{{{k+1}}}$')
+    plt.xlabel('time')
+    plt.legend(loc='upper right')
+    # plt.savefig(f'Simu_z pour k={k} w={w} k1={16} k2={18}.png') #uncomment this line if you want to save the figure
+    plt.show()
+    
+for k in range (2):
+    x_k = x[:,k]
+    x_predit_k = x_predit[:,k] 
+    plt.plot(t,x_k,label=f'$x_{{real_{{{k+1}}}}}$',color='blue')
+    plt.plot(t,x_predit_k,label=f'$x_{{predicted_{{{k+1}}}}}$',color='green')
+    plt.xlabel('time')
+    plt.legend(loc='upper right')
+    # plt.savefig(f'Simu_x pour k={k} w={w} k1={16} k2={18}.png') #uncomment this line if you want to save the figure
+    plt.show()
+    # plt.plot(t,x_predit_k-x_k)  # uncomment these lines if you want to plot the difference between the real x and the predicted one
+    # plt.show()
+    
+plt.plot(t,input)
+# plt.savefig(f'input w={w} k1={16} k2={18}.png') #uncomment this line if you want to save the figure
