@@ -85,4 +85,23 @@ The loss function (mean squared error) on the test set for $NN_1$ is $4,2.10^{-7
 Then, we can for each point have access to the mean squared error (for the couples ($x,x_{predicted}$) and ($z=T(x),z_{predicted}$)) and plot an histogram for each component with the logarithmic error in the $x$-axis and the number of points in the $y$-axis.
 
 ### What you should execute:
-You should execute the scirpt "4-Test_Neural_Networks.py". The lines 46-47
+You should execute the scirpt "4-Test_Neural_Networks.py". The lines 38-41 loads the arrays min and max (you can use the one in the repository). The lines 43-44 loads the test test obtained in step 2 and the lines 46-47 loads our model. You can change the model by correctly changing the lines above.
+
+## Fifth step :
+Application for predicting a real trajectory.
+
+### What we do in this part:
+Now that the neural networks are trained we will apply the $NN_2$ to the output $z$ of the system \eqref{obs_pendule} in order to predict $(x_1,x_2)$:
+
+We initialize the system in  $(x_1_0 = 0.33019075, x_2_0 = -0.71512765)$ and integrate the principle equation during an arbitrary time $t_{simulation} = 40s$ (long enough to ensure the convergence of the observer) in order to have for all $t$ in $[0,t_{simulation}]$ the measure $y=(x_1(t),u(t))$ necessary for the observer,and the couple ($x_{real}_1(t),x_{real}_2(t)$) in order to compare it to the predicted one (in reality $y$ is directly measured with physical sensors but since we don't have access to real measures we use this procedure instead). Then, we use the observer during the same time $t_{simulation}$ with an arbitray initial condition (for instance $(0,0,0,0,0,0)$). Finally, we apply the $NN_2$ to each point $z(t)$ at a time $t\in[0,t_{simulation}]$ to obtain a couple ($x_{predicted}_1(t),x_{predicted}_2(t)$) that can be compared to ($x_{real}_1(t),x_{real}_2(t)$) to evaluate the performances of the observer along a trajectory.
+
+* We apply in a first step this method with an input represented by a sinusuid Amp*np.cos(w*t-fi) of constant frequency w= 0.3189678255430453 and where 
+$$
+Amp = 0.5557902677321038 
+fi = 0.3538347020102439 $$
+We obtain the figures for z,T(x_real),T(x_predicted) and for x_real and x_predicted in the folder 
+
+* The we apply the method to an input with a lightly variable frequency (which equals w/2 for t<16, w for t>24 and a polynomial interpolation of order 3 between the two) with the same formula Amp*np.cos(w*t-fi).
+We obtain the figures for z,T(x_real),T(x_predicted) and for x_real and x_predicted in the folder 
+
+* Lastly we apply the method to an input with 
