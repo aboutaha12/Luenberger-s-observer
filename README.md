@@ -18,9 +18,9 @@ $\begin{equation}\label{pendule}
 , \quad y=x_1 \quad
 \end{equation}$
 
-You will find these functions in the script .
+You will find these functions in the script '1-Constants_functions.py '.
 
-If you want to use the neural networks already trained go directly to step .
+If you want to use the neural networks already trained go directly to step 5.
 
 ## Second step:
 Create the datasets necessary for the training of the neural networks.
