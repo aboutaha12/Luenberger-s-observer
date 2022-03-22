@@ -10,7 +10,8 @@ More details on the theory and design of functional KKL observers appear in
 
 *On the existence of robust functional KKL observers*, Mario Spirito, Pauline Bernard, Lorenzo Marconi, American Control Conference, 2022.
 
-## Organization of the different scripts## 
+## Organization of the different scripts 
+
 ## First step :
 Define the different functions of the problem as well as the constants and the matrices that we have chosen for the observer.
 The equations are :
