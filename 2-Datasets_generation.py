@@ -60,7 +60,7 @@ for i_x1 in x1_boucle:
                     inits[s,:5] = x_init_back
                     s += 1
 
-# np.save("dataset_init.npy", inits)
+# np.save("dataset_init.npy", inits)  # uncomment this line if you want to save the dataset of inits points
 
 '''inits = np.load("dataset_init.npy")'''
 
